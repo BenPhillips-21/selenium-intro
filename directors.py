@@ -1,51 +1,62 @@
-'''
-    It's your turn!!!
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import pandas as pd
+import openpyxl
+from time import sleep
 
-    You will find the directors who won 'Best Director' award in Drama genre
-and save their height :)
+options = webdriver.ChromeOptions()
+options.add_argument('--start-maximized')
+# options.add_argument('--headless')
+options.add_experimental_option('detach', True)
+driver = webdriver.Chrome(options=options)
+driver.implicitly_wait(5)
 
-    Start from this link:
-    https://www.imdb.com/search/title/?explore=genres&title_type=feature
+url = 'https://www.imdb.com/search/title/?explore=genres&title_type=feature'
+driver.get(url)
+sleep(1)
+print(driver.title)
 
-    Let's start, you are ready!
-'''
+bio_filter_button_span = driver.find_element(By.XPATH, '//span[text()="Biography"]')
+bio_filter_button = bio_filter_button_span.find_element(By.XPATH, './..')
+driver.execute_script("arguments[0].click();", bio_filter_button)
 
+doco_checkbox = driver.find_element(By.ID, 'exclude-documentary-checkbox')
+print(doco_checkbox.get_attribute('type'))
+driver.execute_script("arguments[0].click();", doco_checkbox)
 
+short_checkbox = driver.find_element(By.ID, 'exclude-short-checkbox')
+print(short_checkbox.get_attribute('type'))
+driver.execute_script("arguments[0].click();", short_checkbox)
 
-# Create a dictionary to save the data. Keys: 'name', 'height_inch', 'height_cm'
+awards_accordion = driver.find_element(By.XPATH, '/html/body/div[2]/main/div[2]/div[3]/section/section/div/section/section/div[2]/div/section/div[2]/div[1]/section/div/div[6]/div[1]/label')
+driver.execute_script("arguments[0].click();", awards_accordion)
 
+oscar_nominated_filter_span = driver.find_element(By.XPATH, '//span[text()="Oscar-Nominated"]')
+oscar_nominated_filter = oscar_nominated_filter_span.find_element(By.XPATH, './..')
+driver.execute_script("arguments[0].click();", oscar_nominated_filter)
 
+top_1000_filter_span = driver.find_element(By.XPATH, '//span[text()="IMDb Top 1000"]')
+top_1000_filter = top_1000_filter_span.find_element(By.XPATH, './..')
+driver.execute_script("arguments[0].click();", top_1000_filter)
 
-# Import necessary libraries, you can add some others when you need them later on.
+view_more_button_grandchild = driver.find_element(By.XPATH, '//span[text()="29 more"]')
+view_more_button = view_more_button_grandchild.find_element(By.XPATH, './../..')
+driver.execute_script("arguments[0].click();", view_more_button)
 
+sleep(2)
 
+biopics_container = driver.find_element(By.XPATH, '//ul[@class="ipc-metadata-list ipc-metadata-list--dividers-between sc-e22973a9-0 khSCXM detailed-list-view ipc-metadata-list--base"]')
+print(biopics_container.tag_name)
+biopics = biopics_container.find_elements(By.XPATH, './li')
 
-# Define the options, create the driver, get to the main page
+biopic_links = []
 
+print(len(biopics))
 
+for pic in biopics:
+    pic_anchor = pic.find_element(By.XPATH, './/a[@class="ipc-title-link-wrapper"]')
+    pic_href = pic_anchor.get_attribute('href')
+    biopic_links.append(pic_href)
 
-# Check for cookies and accept if appears(wait a few seconds before checking)
-
-
-
-# Select 'Drama' genre and select 'Best Director-Winning' from filters
-
-
-
-# Create a loop to load all movies by pressing 'more' button at the bottom (The same with earlier)
-
-
-
-# Take a list of information buttons(use svg tags) at the right side of all the movies
-
-
-
-# Create a loop to press info buttons one by one and take the links of the directors from them into a list
-
-
-
-# Visit every link using a loop and save name and height of director to the dictionary you defined at the beginning
-
-
-
-# Using Pandas save the data into Excel
+for link in biopic_links:
+    print(link)
